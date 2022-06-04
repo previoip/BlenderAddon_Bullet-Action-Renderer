@@ -156,5 +156,5 @@ cython_debug/
 Blendfiles/
 
 # Misc
+setup.py
 testtemp.py
-modules/Fragments

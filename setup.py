@@ -65,6 +65,7 @@ class CreateEmpty(bpy.types.Operator):
         
         o_selected = bpy.context.selected_objects[0]
         o_selected.name = t_name
+
         return {'FINISHED'}
 
 class CreateCameraPreview(bpy.types.Operator):
