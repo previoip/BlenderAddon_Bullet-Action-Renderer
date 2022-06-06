@@ -1,7 +1,7 @@
 import imp
 import bpy
-from mathutils import Vector, Matrix, Euler, Quartenion
-from math import radians, sin, cos, sqrt, pi
+from mathutils import Vector, Matrix, Euler, Quaternion
+from math import radians, sin, cos, sqrt, pi 
 from typing import Union, TypeAlias
 import random
 
@@ -20,7 +20,7 @@ def normalize_deg(deg, mode='r'):
         return deg % 360
 
 
-def normalize_vector(vector: GenericVector) -> Vector:
+def normalize_vector(vector: GenericVector):
     if sum(vector) == 1:
         return vector
     return vector / sum(vector)
@@ -31,37 +31,34 @@ def clear_objects_data(objs: list) -> None:
     scene_copy['selected_objects'] = objs
     bpy.ops.object.delete(scene_copy)
 
-def set_object_loc_by_name(name: str, loc: GenericVector = Vector((0, 0, 0))) -> Vector:
+def set_object_loc_by_name(name: str, loc: GenericVector = Vector((0, 0, 0))):
     """ Sets object by name in cartesian coordinates, returns final position (Vector) """
     obj = bpy.data.objects[name]
     obj.location = loc
-    return Vector(obj.location)
+    return obj
 
-def move_object_loc_by_name(name: str, loc: GenericVector = Vector((0, 0, 0))) -> Vector:
+def move_object_loc_by_name(name: str, loc: GenericVector = Vector((0, 0, 0))):
     """ Moves object by name in cartesian coordinates, returns final position (Vector) """
     loc = Vector(loc)
     obj = bpy.data.objects[name]
     obj.location += loc
-    return Vector(obj.location)
+    return obj
 
-def pivot_object_from_point(name: str, pivot: GenericVector = Vector((0, 0, 0)), axis: GenericVector = Vector((0, 0, 0)), angle_deg: float = .0) -> Vector:
+def pivot_object_from_point(name: str, pivot_loc: GenericVector = Vector((0, 0, 0)), pivot_angle: GenericVector = Vector((0, 0, 0)), rotation_deg: float = .0):
     """ Rotates object along a pivot point and direction, returns final position (Vector) """
     obj = bpy.data.objects[name]
-    loc = Vector(obj.location)
-    pivot = Vector(pivot)
-    angle = radians(angle_deg)    
-    axis = Vector(axis)
+    pivot_loc = Vector(pivot_loc)
+    pivot_angle = Vector(pivot_angle)
     
-    tetha = axis * angle
-    
-    _x, _y, _z = obj.location.copy()
-    _ax, _ay, _az = Vector(obj.rotation_euler) + tetha
-    _dx, _dy, _dz = loc - pivot
-    _r = sqrt(sum(( _dx**2, _dy**2, _dz**2) ))
-    
-    mat_rot = Matrix.Rotation(angle, 4, 'Z')
-    
-    obj.location = loc @ mat_rot
-    obj.rotation_euler =  (normalize_deg(_ax), normalize_deg(_ay), normalize_deg(_az))
+    rot_angle = radians(rotation_deg)    
+    mat_rot = Matrix.Rotation(rot_angle, 4, 'Z')
+    mat_trans = Matrix.Translation(pivot_loc)
+    mat_trans_inv = Matrix.Translation(pivot_loc * -1)
+    mat_angle = Euler(pivot_angle * -1).to_matrix()
+    mat_angle_inv = Euler(pivot_angle).to_matrix()
 
-    return Vector(obj.location), Vector(obj.rotation_euler)
+    obj.location = mat_trans_inv @ obj.location @ mat_angle_inv
+    obj.location = obj.location @ mat_rot    
+    obj.location = mat_trans @ obj.location @ mat_angle
+
+    return obj

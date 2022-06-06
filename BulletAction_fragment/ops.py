@@ -2,7 +2,9 @@ import bpy
 from bpy.types import Operator
 from . import utils
 
-class BaseOps: pass
+class BaseOps:
+    CAMERA_TARGET_NAME = "BA_CAM"
+
 
 ### -----------------------
 
