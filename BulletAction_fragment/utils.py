@@ -1,7 +1,7 @@
 import imp
 import bpy
 from mathutils import Vector, Matrix, Euler, Quartenion
-from math import radians, sin, cos
+from math import radians, sin, cos, sqrt, pi
 from typing import Union, TypeAlias
 import random
 
@@ -12,6 +12,13 @@ def fast_sha(seed: str) -> str:
     random.seed(seed)
     h = random.getrandbits(128)
     return "%032x" % h 
+
+def normalize_deg(deg, mode='r'):
+    if mode == 'r':
+        return deg % pi
+    elif mode == 'd':
+        return deg % 360
+
 
 def normalize_vector(vector: GenericVector) -> Vector:
     if sum(vector) == 1:
@@ -40,18 +47,21 @@ def move_object_loc_by_name(name: str, loc: GenericVector = Vector((0, 0, 0))) -
 def pivot_object_from_point(name: str, pivot: GenericVector = Vector((0, 0, 0)), axis: GenericVector = Vector((0, 0, 0)), angle_deg: float = .0) -> Vector:
     """ Rotates object along a pivot point and direction, returns final position (Vector) """
     obj = bpy.data.objects[name]
-    _x, _y, _z = list(obj.location)
-    _ax, _ay, _az = list(obj.rotation_euler)
-    _r = sqrt(sum(( (pivot[0] - _x)**2, (pivot[1] - _y)**2, (pivot[2] - _z)**2) ))
-    angle_deg = radians(angle_deg)    
+    loc = Vector(obj.location)
+    pivot = Vector(pivot)
+    angle = radians(angle_deg)    
     axis = Vector(axis)
-
-    _ax, _ay, _az = _ax+angle_deg*axis[0], _ay+angle_deg*axis[1], _az+angle_deg*axis[2]    
-    _x = _r * cos(_ax) + pivot[0]
-    _y = _r * sin(_ay) + pivot[1]
-    _z = _r * cos(_az) + pivot[2]
     
-    obj.location = (_x, _y, _z)
-    obj.rotation_euler = (_ax, _ay, _az)
+    tetha = axis * angle
+    
+    _x, _y, _z = obj.location.copy()
+    _ax, _ay, _az = Vector(obj.rotation_euler) + tetha
+    _dx, _dy, _dz = loc - pivot
+    _r = sqrt(sum(( _dx**2, _dy**2, _dz**2) ))
+    
+    mat_rot = Matrix.Rotation(angle, 4, 'Z')
+    
+    obj.location = loc @ mat_rot
+    obj.rotation_euler =  (normalize_deg(_ax), normalize_deg(_ay), normalize_deg(_az))
 
     return Vector(obj.location), Vector(obj.rotation_euler)
