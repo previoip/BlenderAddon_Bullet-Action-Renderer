@@ -25,7 +25,7 @@ if IF_DEV:
 
 from bpy.props import BoolProperty, EnumProperty, PointerProperty, CollectionProperty, StringProperty
 from bpy.types import PropertyGroup
-import BulletAction_fragment
+import BulletAction
 
 
 class BulletActionAScene(PropertyGroup):
@@ -34,7 +34,7 @@ class BulletActionAScene(PropertyGroup):
 
 
 classes = \
-    BulletAction_fragment.classes + \
+    BulletAction.classes + \
     (BulletActionAScene, )
 
 

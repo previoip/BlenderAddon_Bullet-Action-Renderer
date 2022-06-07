@@ -20,14 +20,14 @@ class AddEmptyTarget:
         offset = 2
         objs = bpy.context.selected_objects
 
-        if objs and objs[0].name == self.CAMERA_TARGET_NAME :
+        if objs and objs[0].name.startswith(self.CAMERA_TARGET_NAME) :
             objs.pop(0)
 
         if objs:
             coord = objs[0].location.copy()
             rot = objs[0].rotation_euler.copy()
 
-        if self.OBJECTS.find(self.CAMERA_TARGET_NAME) != -1:
+        if utils.collection_has_item(self.OBJECTS.keys(), self.CAMERA_TARGET_NAME):
             obj_ls = [i for i in self.OBJECTS if i.name.startswith(self.CAMERA_TARGET_NAME)]
             for obj in obj_ls:
                 self.OBJECTS.remove(obj, do_unlink=True)

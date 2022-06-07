@@ -3,6 +3,7 @@ import bpy
 from mathutils import Vector, Matrix, Euler, Quaternion
 from math import radians, sin, cos, sqrt, pi 
 from typing import Union
+from itertools import takewhile
 import random
 
 # typedef
@@ -18,6 +19,16 @@ def normalize_deg(deg, mode='r'):
         return deg % pi
     elif mode == 'd':
         return deg % 360
+
+def collection_has_item(collection, name: str):
+    names = iter(collection)
+    try:
+        while True:
+            if next(names).startswith(name):
+                return True
+    except StopIteration:
+        return False
+
 
 def clear_objects_data(objs: list) -> None:
     """ Delete and Clear Objects from Scene-Blendfile """
