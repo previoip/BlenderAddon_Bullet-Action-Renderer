@@ -28,14 +28,14 @@ from bpy.types import PropertyGroup
 import BulletAction
 
 
-class BulletActionAScene(PropertyGroup):
-    # tool: PointerProperty(type=BulletAction_fragment.props)
+class BulletActionPropertyGroup(PropertyGroup):
+    # tool: PointerProperty(type=BulletAction.props)
     pass
 
 
 classes = \
     BulletAction.classes + \
-    (BulletActionAScene, )
+    (BulletActionPropertyGroup, )
 
 
 def register():
@@ -45,7 +45,7 @@ def register():
     for cls in classes:
         print('registering:', cls)
         bpy.utils.register_class(cls)
-    bpy.types.Scene.bulletActionAddon = PointerProperty(type=BulletActionAScene)
+    bpy.types.Scene.bulletActionAddon = PointerProperty(type=BulletActionPropertyGroup)
 
 def unregister():
     for cls in reversed(classes):
