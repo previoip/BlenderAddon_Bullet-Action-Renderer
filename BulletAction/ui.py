@@ -13,27 +13,45 @@ class BULLETACTION_layout:
     def draw(self, context):
         layout = self.layout
         scene = context.scene
+        addon_prop = scene.bulletActionAddon_settings
 
-        box_1 = layout.box()
-        box_2 = layout.box()
-        box_3 = layout.box()
+        box = layout.box()
 
-        box_1.label(text="Initialize Addon")
-        row_1_1 = box_1.row()
-        row_1_1.operator("object.create_empty_on_selected", text='Init Target')
-        row_1_1.operator("object.create_camera_to_target", text='Spawn Camera')
-        row_1_2 = box_1.row()
-        row_1_2.operator("object.clear_addon_objects", text='Clear Addon Objects')
+        box.label(text="Initialize Addon")
 
-        box_2.label(text="Adjustments")
-        row_2_1 = box_2.row()
-        row_2_1.operator("object.pivot_camera_clockwise", text='Pivot +')
-        row_2_1.operator("object.pivot_camera_counter_clockwise", text='Pivot -')
+        col = box.column(align=True)
+        col.prop(addon_prop, 'cam_incl', slider=False)
+        col.prop(addon_prop, 'cam_incr', slider=False)
+        col.prop(addon_prop, 'cam_rot_offset', slider=False)
+        col.prop(addon_prop, 'cam_dist_offset', slider=False)
+
+        row = box.row(align=True)
+        row.operator("object.create_empty_on_selected", text='Init Target')
+        row.operator("object.create_camera_to_target", text='Spawn Camera')
+        row = box.row()
+        row.operator("object.clear_addon_objects", text='Clear Addon Objects')
+
+        
+        box = layout.box()
+        box.label(text="Adjustments")
+        
+        row = box.row(align=True)
 
 
-        box_3.label(text="Render")
-        row_3_1 = box_3.row()
-        row_3_1.operator("render.render_bullet_action_on_target_or_selected", text='Begin Render')
+        row.label(text="Pivot Angle")
+        row.prop(addon_prop, 'other_cam_pivot_angle', text='')
+        col = box.column(align=True)
+        row = col.row(align=True)
+        row.operator("object.pivot_camera_clockwise", text='+')
+        row.operator("object.pivot_camera_counter_clockwise", text='-')
+        col.operator("object.pivot_camera_reset", text='Reset')
+
+        box = layout.box()
+        box.label(text="Render util")
+        row = box.row()
+        row.prop(addon_prop, 'addn_export_folder')
+        row = box.row()
+        row.operator("render.render_bullet_action_on_target_or_selected", text='Begin Render')
 
 
 

@@ -83,17 +83,32 @@ def pivot_object_from_point(obj: Object, pivot_loc: Vector = Vector((0, 0, 0)), 
     return obj
 
 
-def pivot_object_from_target_z_axis(obj, obj_pivot, angle = .0):    
+def pivot_object_from_target_local_axis(obj, obj_pivot, angle = .0, axis_str: str ='Z', return_to_original_pos: bool = False):    
     """ Rotates object along a z axis of pivot object and angle increment """
+    if angle == 0:
+        return obj
+    # save selected objecs data to be retirned after function call
+    previously_selected = bpy.context.selected_objects
+    bpy.ops.object.select_all(action='DESELECT')
     # set target (obj) as obj's parent (obj_pivot)
     obj.select_set(state=True)
     obj_pivot.select_set(state=True)
     bpy.context.view_layer.objects.active = obj_pivot
     bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+
     # fancy transformation to parent obj (obj_pivot)
-    obj_pivot.rotation_euler.rotate_axis('Z', radians(angle))
-    # return everything to initial conditions
+    obj_pivot.rotation_euler.rotate_axis(axis_str, radians(angle))
+
+    # unparent everything
     bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
     bpy.ops.object.select_all(action='DESELECT')
-    return bpy
+
+    # return everything to initial conditions
+    if return_to_original_pos:
+        obj_pivot.rotation_euler.rotate_axis(axis_str, radians(angle * -1))
+    if previously_selected:
+        for o in previously_selected:
+            o.select_set(state=True)
+        bpy.context.view_layer.objects.active = previously_selected[0]
+    return obj
 

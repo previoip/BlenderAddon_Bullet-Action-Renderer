@@ -1,14 +1,17 @@
-from math import radians, log2
-from select import select
+from lib2to3.pgen2.token import OP
+from math import radians, degrees, log2
 import bpy
 from bpy.types import Operator
-from . import utils
+# from bpy.props import IntProperty, FloatProperty
+
 from mathutils import Vector, Euler
+from . import utils
 
 class BaseOps:
     OBJECTS = bpy.data.objects
     EMPTY_TARGET_NAME = "BA_EMPTY_TARGET"
     CAMERA_NAME = "BA_CAMERA"
+    PIVOT_INCR = 45
 
 ### -----------------------
 
@@ -50,12 +53,14 @@ class CreateCameraTarget:
     """ Create seperate camera primitive """
     bl_idname = 'object.create_camera_to_target'
     bl_label = "Create Camera to Target or Selected"
-    
     def execute(self, context):
-
+        scene = context.scene
+        addon_prop = scene.bulletActionAddon_settings
         utils.clear_objects_with_prefix(self.CAMERA_NAME)
         
         if self.OBJECTS.find(self.EMPTY_TARGET_NAME) != -1:
+            incl = degrees(addon_prop.cam_incl)
+            
             obj_empty = self.OBJECTS[self.EMPTY_TARGET_NAME]
             loc, _, rot = utils.get_bbox_dimensions(obj_empty)
             bpy.ops.object.camera_add(location=loc, rotation=rot)
@@ -66,6 +71,9 @@ class CreateCameraTarget:
             offset = obj_empty.empty_display_size + log2(obj_empty.empty_display_size + 1) * 8
             utils.move_object_along_z_normal(obj, offset, axis=(0,-1,0))
             obj.rotation_euler.rotate_axis('X', radians(90))
+            
+            utils.pivot_object_from_target_local_axis(obj, obj_empty, incl * -1, axis_str='X', return_to_original_pos=True)
+
             context.scene.camera = obj
 
         return {'FINISHED'}
@@ -85,12 +93,18 @@ class PivotCameraCW:
     """ Rendering operation wrapper-ish """
     bl_idname = 'object.pivot_camera_clockwise'
     bl_label = "Pivots Camera Clockwise"
+    
 
     def execute(self, context):
+        scene = context.scene
+        addon_prop = scene.bulletActionAddon_settings
+        pivot_angle_incr = degrees(addon_prop.other_cam_pivot_angle)
+        if pivot_angle_incr == 0:
+            return {'FINISHED'}
         if utils.collection_has_prefix(self.OBJECTS.keys(),name=self.CAMERA_NAME) and utils.collection_has_prefix(self.OBJECTS.keys(), name=self.EMPTY_TARGET_NAME):
             obj_t = self.OBJECTS[self.CAMERA_NAME]
             obj_p = self.OBJECTS[self.EMPTY_TARGET_NAME]
-            utils.pivot_object_from_target_z_axis(obj_t, obj_p, 10)
+            utils.pivot_object_from_target_local_axis(obj_t, obj_p, pivot_angle_incr)
         return {'FINISHED'}
 
 
@@ -100,11 +114,30 @@ class PivotCameraCCW:
     bl_label = "Pivots Camera Counter Clockwise"
 
     def execute(self, context):
+        scene = context.scene
+        addon_prop = scene.bulletActionAddon_settings
+        pivot_angle_incr = degrees(addon_prop.other_cam_pivot_angle)
+        if pivot_angle_incr == 0:
+            return {'FINISHED'}
         if utils.collection_has_prefix(self.OBJECTS.keys(),name=self.CAMERA_NAME) and utils.collection_has_prefix(self.OBJECTS.keys(), name=self.EMPTY_TARGET_NAME):
             obj_t = self.OBJECTS[self.CAMERA_NAME]
             obj_p = self.OBJECTS[self.EMPTY_TARGET_NAME]
-            utils.pivot_object_from_target_z_axis(obj_t, obj_p, -10)
+            utils.pivot_object_from_target_local_axis(obj_t, obj_p, pivot_angle_incr * -1)
         return {'FINISHED'}
+
+class PivotCameraReset:
+    """ Rendering operation wrapper-ish """
+    bl_idname = 'object.pivot_camera_reset'
+    bl_label = "Reset Pivot Rotation"
+
+    def execute(self, context):
+        if utils.collection_has_prefix(self.OBJECTS.keys(),name=self.CAMERA_NAME) and utils.collection_has_prefix(self.OBJECTS.keys(), name=self.EMPTY_TARGET_NAME):
+            obj_t = self.OBJECTS[self.CAMERA_NAME]
+            obj_p = self.OBJECTS[self.EMPTY_TARGET_NAME]
+            utils.pivot_object_from_target_local_axis(obj_t, obj_p, degrees(obj_p.rotation_euler.z) * -1)
+        return {'FINISHED'}
+
+
 
 class BeginRenderOnTarget:
     """ Rendering operation wrapper-ish """
@@ -122,8 +155,8 @@ class CreateCameraTarget_OT_Operator(Operator, CreateCameraTarget, BaseOps): pas
 class ClearAddonObjects_OT_Operator(Operator, ClearAddonObjects, BaseOps): pass
 class PivotCameraCCW_OT_Operator(Operator, PivotCameraCCW, BaseOps): pass
 class PivotCameraCW_OT_Operator(Operator, PivotCameraCW, BaseOps): pass
+class PivotCameraReset_OT_Operator(Operator, PivotCameraReset, BaseOps): pass
 class BeginRenderOnTarget_OT_Operator(Operator, BeginRenderOnTarget, BaseOps): pass
-
 
 
 classes = (
@@ -132,5 +165,6 @@ classes = (
     ClearAddonObjects_OT_Operator,
     PivotCameraCCW_OT_Operator,
     PivotCameraCW_OT_Operator,
+    PivotCameraReset_OT_Operator,
     BeginRenderOnTarget_OT_Operator,
 )

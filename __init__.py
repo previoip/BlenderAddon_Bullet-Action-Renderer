@@ -11,6 +11,8 @@ bl_info = {
     'author': 'Previo Prakasa'
 }
 
+from email.policy import default
+from unicodedata import name
 import bpy
 
 def dev_init():
@@ -23,19 +25,60 @@ def dev_init():
 if IF_DEV:
     dev_init()
 
-from bpy.props import BoolProperty, EnumProperty, PointerProperty, CollectionProperty, StringProperty
+from bpy.props import PointerProperty, BoolProperty, IntProperty, FloatProperty, CollectionProperty, StringProperty
 from bpy.types import PropertyGroup
 import BulletAction
 
 
-class BulletActionPropertyGroup(PropertyGroup):
-    # tool: PointerProperty(type=BulletAction.props)
-    pass
+class BulletActionScenePropertyGroup(PropertyGroup):
+    addn_export_folder: StringProperty(
+        name="subfolder export", 
+        default="export"
+        )
+    addn_render_type: BoolProperty(
+        name="Render as Bulletaction"
+        )
+    cam_incl: FloatProperty(
+        name="Inclination", 
+        default=57.3, 
+        min=-360, 
+        max=360, 
+        precision=2,
+        subtype='ANGLE'
+        )
+    cam_incr: IntProperty(
+        name="Increment", 
+        default=8, 
+        min=1, 
+        max=36
+        )
+    cam_rot_offset: FloatProperty(
+        name="Offset Angle", 
+        default=0, 
+        min=-360, 
+        max=360, 
+        precision=2,
+        subtype='ANGLE'
+        )
+    cam_dist_offset: FloatProperty(
+        name="Offset Distance", 
+        min=0,
+        default=1, 
+        max=1000
+        )
+    other_cam_pivot_angle: FloatProperty(
+        name="Pivot Angle", 
+        default=45, 
+        min=-180, 
+        max=180, 
+        precision=2,
+        subtype='ANGLE'
+        )
 
 
 classes = \
-    BulletAction.classes + \
-    (BulletActionPropertyGroup, )
+    (BulletActionScenePropertyGroup, ) + \
+    BulletAction.classes 
 
 
 def register():
@@ -45,17 +88,18 @@ def register():
     for cls in classes:
         print('registering:', cls)
         bpy.utils.register_class(cls)
-    bpy.types.Scene.bulletActionAddon = PointerProperty(type=BulletActionPropertyGroup)
+
+    bpy.types.Scene.bulletActionAddon_settings = PointerProperty(type=BulletActionScenePropertyGroup)
 
 def unregister():
-    for cls in reversed(classes):
+    for cls in classes:
         print('unregistering:', cls)
         try:
             bpy.utils.unregister_class(cls)
         except RuntimeError as e:
             print(e)
     try:
-        del bpy.types.Scene.bulletActionAddon
+        del bpy.types.Scene.bulletActionAddon_settings
     except AttributeError as e:
         print(e)
 
