@@ -19,10 +19,14 @@ class BULLETACTION_layout:
         box.label(text="Initialize Addon")
 
         col = box.column(align=True)
+        col.prop(addon_prop, 'cam_type_enum')
         col.prop(addon_prop, 'cam_incl', slider=False)
         col.prop(addon_prop, 'cam_incr', slider=False)
         col.prop(addon_prop, 'cam_rot_offset', slider=False)
         col.prop(addon_prop, 'cam_dist_offset', slider=False)
+        col.prop(addon_prop, 'cam_dist_clip_multi', slider=False)
+        col.prop(addon_prop, 'cam_dist_offset_auto')
+        col.prop(addon_prop, 'cam_scale_auto')
 
         row = box.row(align=True)
         row.operator("object.create_empty_on_selected", text='Init Target')

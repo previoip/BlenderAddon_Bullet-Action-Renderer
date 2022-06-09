@@ -64,13 +64,13 @@ def get_bbox_dimensions(obj: Object):
     center = [ fcenter(axis) for axis in [x,y,z] ]
     return Vector(center), dim, rot
 
-def pivot_object_from_point(obj: Object, pivot_loc: Vector = Vector((0, 0, 0)), pivot_normal_angle: Vector = Vector((0, 0, 0)), rotation_deg: float = .0):
+def pivot_object_from_point(obj: Object, pivot_loc: Vector = Vector((0, 0, 0)), pivot_normal_angle: Vector = Vector((0, 0, 0)), angle: float = .0):
     """ Rotates object along a pivot point and direction, broken and doesnt work """
     pivot_loc = Vector(pivot_loc)
     pivot_normal_angle = Vector(pivot_normal_angle)
 
-    rotation_rad = radians(rotation_deg)    
-    mat_rot = Matrix.Rotation(rotation_rad, 4, 'Z')
+    # rotation_rad = radians(rotation_deg)    
+    mat_rot = Matrix.Rotation(angle, 4, 'Z')
     mat_angle = Euler(pivot_normal_angle * -1).to_matrix()
     mat_angle_inv = Euler(pivot_normal_angle).to_matrix()
 
@@ -97,7 +97,7 @@ def pivot_object_from_target_local_axis(obj, obj_pivot, angle = .0, axis_str: st
     bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
 
     # fancy transformation to parent obj (obj_pivot)
-    obj_pivot.rotation_euler.rotate_axis(axis_str, radians(angle))
+    obj_pivot.rotation_euler.rotate_axis(axis_str, angle)
 
     # unparent everything
     bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
@@ -105,10 +105,36 @@ def pivot_object_from_target_local_axis(obj, obj_pivot, angle = .0, axis_str: st
 
     # return everything to initial conditions
     if return_to_original_pos:
-        obj_pivot.rotation_euler.rotate_axis(axis_str, radians(angle * -1))
+        obj_pivot.rotation_euler.rotate_axis(axis_str, angle * -1)
     if previously_selected:
         for o in previously_selected:
             o.select_set(state=True)
         bpy.context.view_layer.objects.active = previously_selected[0]
     return obj
 
+
+def get_extrema_from_vector(vec: Vector):
+    if vec.x >= vec.y and vec.x >= vec.z:
+        mag = vec.x
+        ax = 'X'
+    elif vec.y >= vec.x and vec.y >= vec.z:
+        mag = vec.y
+        ax = 'Y'
+    elif vec.z >= vec.x and vec.z >= vec.y:
+        mag = vec.z
+        ax = 'Z'
+    else:
+        mag = max(vec)
+        ax = None
+    return mag, ax
+
+def is_empty_vector(vec: Vector):
+    return vec.x == 0  and vec.y == 0  and vec.z == 0
+
+def radius_from_origin(vec: Vector, ref_point: Vector = Vector((0,0,0))):
+    if is_empty_vector(vec) and is_empty_vector(ref_point):
+        return 0
+    vec = vec - ref_point
+    return sqrt(vec.x**2 + vec.y**2 + vec.z**2)
+
+    

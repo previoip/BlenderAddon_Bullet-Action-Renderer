@@ -1,9 +1,6 @@
-from lib2to3.pgen2.token import OP
-from math import radians, degrees, log2
+from math import radians, degrees, log2, atan, sin
 import bpy
 from bpy.types import Operator
-# from bpy.props import IntProperty, FloatProperty
-
 from mathutils import Vector, Euler
 from . import utils
 
@@ -21,6 +18,9 @@ class AddEmptyTarget:
     bl_label = "Create Empty Target on Selected"
     
     def execute(self, context):
+        scene = context.scene
+        addon_prop = scene.bulletActionAddon_settings
+
         coord = Vector((0,0,0))
         rot = Euler((0,0,0))
         dim = Vector((0,0,2))
@@ -46,6 +46,8 @@ class AddEmptyTarget:
         bpy.ops.object.select_all(action='DESELECT')
         if objs:
             objs[0].select_set(True)
+        
+        addon_prop.priv_t_obj_dimensions = dim
         return {'FINISHED'}
 
 
@@ -56,19 +58,39 @@ class CreateCameraTarget:
     def execute(self, context):
         scene = context.scene
         addon_prop = scene.bulletActionAddon_settings
+
         utils.clear_objects_with_prefix(self.CAMERA_NAME)
         
         if self.OBJECTS.find(self.EMPTY_TARGET_NAME) != -1:
-            incl = degrees(addon_prop.cam_incl)
-            
+            incl = addon_prop.cam_incl
+            offset = addon_prop.cam_dist_offset
+            dim = Vector(addon_prop.priv_t_obj_dimensions)
+
             obj_empty = self.OBJECTS[self.EMPTY_TARGET_NAME]
+            if addon_prop.cam_dist_offset_auto :
+                offset = obj_empty.empty_display_size + log2(obj_empty.empty_display_size + 1) * 8
+            else:
+                offset = addon_prop.cam_dist_offset
+
             loc, _, rot = utils.get_bbox_dimensions(obj_empty)
             bpy.ops.object.camera_add(location=loc, rotation=rot)
 
             obj = bpy.context.selected_objects[0]
             obj.name = self.CAMERA_NAME
-            obj.data.type = 'ORTHO' # use prop options
-            offset = obj_empty.empty_display_size + log2(obj_empty.empty_display_size + 1) * 8
+            obj.data.type = addon_prop.cam_type_enum
+            obj.data.show_sensor = True
+            obj.data.show_limits = True
+
+            viewport_ratio = context.scene.render.resolution_y / context.scene.render.resolution_x
+            dim_max, _ = utils.get_extrema_from_vector(dim)
+            perim = utils.radius_from_origin(dim/2, loc)
+
+            obj.data.clip_start = max((.0001, offset - perim * addon_prop.cam_dist_clip_multi))
+            obj.data.clip_end = max(.0001, (offset + perim * addon_prop.cam_dist_clip_multi))
+
+            if addon_prop.cam_type_enum == 'ORTHO' and addon_prop.cam_scale_auto:
+                obj.data.ortho_scale = perim * sin(atan(viewport_ratio)) + dim_max
+
             utils.move_object_along_z_normal(obj, offset, axis=(0,-1,0))
             obj.rotation_euler.rotate_axis('X', radians(90))
             
@@ -98,7 +120,7 @@ class PivotCameraCW:
     def execute(self, context):
         scene = context.scene
         addon_prop = scene.bulletActionAddon_settings
-        pivot_angle_incr = degrees(addon_prop.other_cam_pivot_angle)
+        pivot_angle_incr = addon_prop.other_cam_pivot_angle
         if pivot_angle_incr == 0:
             return {'FINISHED'}
         if utils.collection_has_prefix(self.OBJECTS.keys(),name=self.CAMERA_NAME) and utils.collection_has_prefix(self.OBJECTS.keys(), name=self.EMPTY_TARGET_NAME):
@@ -116,7 +138,7 @@ class PivotCameraCCW:
     def execute(self, context):
         scene = context.scene
         addon_prop = scene.bulletActionAddon_settings
-        pivot_angle_incr = degrees(addon_prop.other_cam_pivot_angle)
+        pivot_angle_incr = addon_prop.other_cam_pivot_angle
         if pivot_angle_incr == 0:
             return {'FINISHED'}
         if utils.collection_has_prefix(self.OBJECTS.keys(),name=self.CAMERA_NAME) and utils.collection_has_prefix(self.OBJECTS.keys(), name=self.EMPTY_TARGET_NAME):
