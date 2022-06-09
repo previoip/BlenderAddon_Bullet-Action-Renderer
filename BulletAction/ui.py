@@ -16,7 +16,6 @@ class BULLETACTION_layout:
         addon_prop = scene.bulletActionAddon_settings
 
         box = layout.box()
-
         box.label(text="Initialize Addon")
 
         col = box.column(align=True)
@@ -36,8 +35,6 @@ class BULLETACTION_layout:
         box.label(text="Adjustments")
         
         row = box.row(align=True)
-
-
         row.label(text="Pivot Angle")
         row.prop(addon_prop, 'other_cam_pivot_angle', text='')
         col = box.column(align=True)
@@ -48,6 +45,10 @@ class BULLETACTION_layout:
 
         box = layout.box()
         box.label(text="Render util")
+
+        col = box.column(align=True)
+        col.prop(addon_prop, 'addn_render_type')
+        col.prop(addon_prop, 'addn_render_postproc')
         row = box.row()
         row.prop(addon_prop, 'addn_export_folder')
         row = box.row()

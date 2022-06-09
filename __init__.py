@@ -43,7 +43,7 @@ def register():
         print('registering:', cls)
         bpy.utils.register_class(cls)
 
-    bpy.types.Scene.bulletActionAddon_settings = PointerProperty(type=BulletAction.props.BulletActionScenePropertyGroup) # this one .props took 2 hours to traceback fuck
+    bpy.types.Scene.bulletActionAddon_settings = PointerProperty(type=BulletAction.props.BulletActionScenePropertyGroup)
 
 def unregister():
     for cls in classes:
