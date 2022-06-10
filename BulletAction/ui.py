@@ -22,7 +22,7 @@ class BULLETACTION_layout:
         col.prop(addon_prop, 'cam_type_enum')
         col.prop(addon_prop, 'cam_incl', slider=False)
         col.prop(addon_prop, 'cam_incr', slider=False)
-        col.prop(addon_prop, 'cam_rot_offset', slider=False)
+        # col.prop(addon_prop, 'cam_rot_offset', slider=False)
         col.prop(addon_prop, 'cam_dist_offset', slider=False)
         col.prop(addon_prop, 'cam_dist_clip_multi', slider=False)
         col.prop(addon_prop, 'cam_dist_offset_auto')
@@ -51,12 +51,19 @@ class BULLETACTION_layout:
         box.label(text="Render util")
 
         col = box.column(align=True)
+        col.prop(addon_prop, 'addn_render_isanimated')
         col.prop(addon_prop, 'addn_render_type')
         col.prop(addon_prop, 'addn_render_postproc')
+        col.prop(addon_prop, 'addn_render_useframeskip')
+        col.prop(addon_prop, 'addn_render_frameskip', slider=False)
         row = box.row()
+        col = box.column(align=False)
+        
         row.prop(addon_prop, 'addn_export_folder')
+        # row = box.row()
+        # row.operator("render.test_render", text='Test Render')
         row = box.row()
-        row.operator("render.render_bullet_action_on_target_or_selected", text='Begin Render')
+        row.operator("render.begin_render", text='Begin Render')
 
 
 

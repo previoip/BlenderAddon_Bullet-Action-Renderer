@@ -7,12 +7,10 @@ bl_info = {
     "location": "Properties > Render > Render Orthos Addon",
     "support": "TESTING",
     "blender": (2, 80, 0),
-    'version': (0, 1, 1),
+    'version': (0, 2, 0),
     'author': 'Previo Prakasa'
 }
 
-from email.policy import default
-from unicodedata import name
 import bpy
 
 def dev_init():

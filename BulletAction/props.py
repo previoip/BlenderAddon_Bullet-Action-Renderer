@@ -19,6 +19,24 @@ class BulletActionScenePropertyGroup(PropertyGroup):
         description = 'Use addons script for rendering mask-map',
         )
 
+    addn_render_isanimated: BoolProperty(
+        name='Is Animated',
+        description = 'renders whole framerange from timeline',
+        )
+
+    addn_render_frameskip: IntProperty(
+        name='Frame Skip', 
+        description = 'Skips frame if jump number of frames for rendering (sueful for checking render results)',
+        default=10, 
+        min=1, 
+        max=1000
+        )
+
+    addn_render_useframeskip: BoolProperty(
+        name='Use Frame Skip',
+        description = 'Use frame skipping for rendering animated object',
+        )
+
     cam_type_enum: EnumProperty(
         name='Camera Type', 
         description = 'Change default camera type',
@@ -61,7 +79,7 @@ class BulletActionScenePropertyGroup(PropertyGroup):
         name='Offset Distance', 
         description = 'Camera distance offset to target reference',
         min=0,
-        default=1, 
+        default=20, 
         max=1000
         )
         
@@ -79,7 +97,7 @@ class BulletActionScenePropertyGroup(PropertyGroup):
         name='Camera Clipping Multiplier', 
         description = 'Camera clipping multiplier',
         min=0,
-        default=1,
+        default=2,
         max=10
         )
 
@@ -94,6 +112,7 @@ class BulletActionScenePropertyGroup(PropertyGroup):
         )
 
     priv_t_obj_dimensions: FloatVectorProperty()
+    priv_t_obj_name: StringProperty()
     # _t_obj_positions: FloatVectorProperty()
     # _t_obj_euler_rotation: FloatVectorProperty()
 

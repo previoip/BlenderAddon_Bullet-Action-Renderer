@@ -1,3 +1,5 @@
+from fileinput import filename
+import os
 import bpy
 from mathutils import Vector, Matrix, Euler, Quaternion
 from math import radians, sin, cos, sqrt, pi 
@@ -11,6 +13,14 @@ def fast_sha(seed: str, l=128) -> str:
     h = random.getrandbits(l)
     return "%032x" % h 
 
+def pad_str(string: str, t='NUM', l=6):
+    len_string=len(string)
+    if len_string >= l:
+        return string
+    if t == 'STR':
+        return string + " "*(l-len_string)
+    elif t == 'NUM':
+        return "0"*(l-len_string) + str(string)
 def normalize_deg(deg, mode='r'):
     if mode == 'r':
         return deg % pi
@@ -137,4 +147,15 @@ def radius_from_origin(vec: Vector, ref_point: Vector = Vector((0,0,0))):
     vec = vec - ref_point
     return sqrt(vec.x**2 + vec.y**2 + vec.z**2)
 
-    
+def render_to_filepath(context, target_filepath, target_filename):
+    curr_filepath = str(context.scene.render.filepath)
+    target_filepath = os.path.join(target_filepath, target_filename)
+    context.scene.render.filepath = target_filepath
+    print(target_filepath, target_filename)
+    bpy.ops.render.render(write_still=True)
+    context.scene.render.filepath = curr_filepath
+    return 
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
