@@ -1,4 +1,3 @@
-from email.policy import default
 from bpy.props import BoolProperty, IntProperty, FloatProperty, FloatVectorProperty, StringProperty, EnumProperty
 from bpy.types import PropertyGroup
 
@@ -20,8 +19,8 @@ class BulletActionScenePropertyGroup(PropertyGroup):
         )
 
     addn_render_isanimated: BoolProperty(
-        name='Is Animated',
-        description = 'renders whole framerange from timeline',
+        name='Render Still',
+        description = 'renders one frame from timeline instead',
         )
 
     addn_render_frameskip: IntProperty(

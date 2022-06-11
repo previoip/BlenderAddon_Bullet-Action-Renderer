@@ -1,27 +1,25 @@
-IF_DEV = True
+# run as script
+load_from_script_tab = __name__ == '__main__'
+
+import bpy
 
 bl_info = {
-    "name": "BulletAction or 360 view rendering util idk",
+    'name': 'BulletAction or 360 view rendering util idk',
     'description': 'render 360 degree bullet-action views with some degree of customizability. mainly for autogenerating sprites from 3D assets',
-    "category": "Object",
-    "location": "Properties > Render > Render Orthos Addon",
-    "support": "TESTING",
-    "blender": (2, 80, 0),
+    'category': 'Object',
+    'location': 'Properties > Render > Render Orthos Addon',
+    'support': 'TESTING',
+    'blender': (2, 80, 0),
     'version': (0, 2, 0),
     'author': 'Previo Prakasa'
 }
 
-import bpy
-
-def dev_init():
+if load_from_script_tab:
     import os, sys
     curr_dir = bpy.path.abspath('//')
     curr_dir = os.path.abspath(os.path.join(curr_dir, '..'))
     if not curr_dir in sys.path:
         sys.path.append(curr_dir)
-
-if IF_DEV:
-    dev_init()
 
 from bpy.props import PointerProperty
 from bpy.types import PropertyGroup
@@ -34,9 +32,9 @@ classes = \
 
 
 def register():
-    if IF_DEV:
+    if load_from_script_tab:
         unregister()
-    
+
     for cls in classes:
         print('registering:', cls)
         bpy.utils.register_class(cls)
@@ -55,5 +53,5 @@ def unregister():
     except AttributeError as e:
         print(e)
 
-if __name__ == "__main__":
+if load_from_script_tab:
     register()

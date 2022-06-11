@@ -34,7 +34,6 @@ class BULLETACTION_layout:
         row = box.row()
         row.operator("object.clear_addon_objects", text='Clear Addon Objects')
 
-        
         box = layout.box()
         box.label(text="Adjustments")
         
@@ -53,7 +52,7 @@ class BULLETACTION_layout:
         col = box.column(align=True)
         col.prop(addon_prop, 'addn_render_isanimated')
         col.prop(addon_prop, 'addn_render_type')
-        col.prop(addon_prop, 'addn_render_postproc')
+        # col.prop(addon_prop, 'addn_render_postproc')
         col.prop(addon_prop, 'addn_render_useframeskip')
         col.prop(addon_prop, 'addn_render_frameskip', slider=False)
         row = box.row()

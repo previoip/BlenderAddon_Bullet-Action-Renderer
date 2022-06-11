@@ -1,9 +1,9 @@
 from math import radians, degrees, log2, pi
+import os
 import bpy
 from bpy.types import Operator
 from mathutils import Vector, Euler
 from . import utils
-import os
 
 class BaseOps:
     EMPTY_TARGET_NAME = "BA_EMPTY_TARGET"
@@ -204,18 +204,21 @@ class BeginRenderOnTarget:
         if target_action:
             fp = os.path.join(fp, target_action)
             utils.mkdir(fp)
-        if not addon_prop.addn_render_isanimated:
-            for i in range(incr_n):
-                utils.pivot_object_from_target_local_axis(camera, pivot, incr_rot)
+        for i in range(incr_n):
+            if not addon_prop.addn_render_isanimated:
                 for frame in range(startframe, stopframe, frame_skip):
                     context.scene.frame_set(frame)
                     filename = f'{target_action}_f{frame:04}_d{int(degrees(i*incr_rot)):03}'
                     exportpath = os.path.join(fp, f'view_{int(degrees(i*incr_rot)):03}')
                     utils.mkdir(exportpath)
                     utils.render_to_filepath(context=context, target_filepath=exportpath, target_filename=filename)
-        else:
-            # render current frame 
-            pass
+            else:
+                frame = context.scene.frame_current
+                filename = f'{target_action}_f{frame:04}_d{int(degrees(i*incr_rot)):03}'
+                exportpath = os.path.join(fp, f'view_{int(degrees(i*incr_rot)):03}')
+                utils.mkdir(exportpath)
+                utils.render_to_filepath(context=context, target_filepath=exportpath, target_filename=filename)
+            utils.pivot_object_from_target_local_axis(camera, pivot, incr_rot)
 
         if previously_selected:
             for o in previously_selected:

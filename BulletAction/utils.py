@@ -1,8 +1,7 @@
-from fileinput import filename
 import os
 import bpy
-from mathutils import Vector, Matrix, Euler, Quaternion
-from math import radians, sin, cos, sqrt, pi 
+from mathutils import Vector, Matrix, Euler
+from math import sqrt, pi 
 import random
 
 # typedef
@@ -142,7 +141,7 @@ def is_empty_vector(vec: Vector):
     return vec.x == 0  and vec.y == 0  and vec.z == 0
 
 def radius_from_origin(vec: Vector, ref_point: Vector = Vector((0,0,0))):
-    if is_empty_vector(vec) and is_empty_vector(ref_point):
+    if is_empty_vector(vec) and is_empty_vector(ref_point) and is_empty_vector(vec - ref_point):
         return 0
     vec = vec - ref_point
     return sqrt(vec.x**2 + vec.y**2 + vec.z**2)
