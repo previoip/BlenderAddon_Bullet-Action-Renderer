@@ -155,6 +155,7 @@ cython_debug/
 # Blender Stuff:
 Blendfiles/
 Export/
+rel/
 
 # Misc
 setup.py

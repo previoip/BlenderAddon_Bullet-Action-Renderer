@@ -4,9 +4,9 @@ load_from_script_tab = __name__ == '__main__'
 import bpy
 
 bl_info = {
-    'name': 'BulletAction or 360 view rendering util idk',
-    'description': 'render 360 degree bullet-action views with some degree of customizability. mainly for autogenerating sprites from 3D assets',
-    'category': 'Object',
+    'name': 'BulletAction Render Toolkit',
+    'description': 'render 360 degree bullet-action views with some degree of customizability.',
+    'category': 'Render',
     'location': 'Properties > Render > Render Orthos Addon',
     'support': 'TESTING',
     'blender': (2, 80, 0),
