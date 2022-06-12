@@ -1,6 +1,4 @@
-# a straight forward script that bundles into zip for blender addon intall
-from fileinput import filename
-from importlib.metadata import metadata
+# run script to bundle addon into one zipfile
 from zipfile import ZipFile
 import re, os
 
@@ -41,7 +39,6 @@ metadata = re.findall(pattern, metadata)[0].split('\n')[1:-1]
 metadata = [i.strip().split(':') for i in metadata]
 metadata = [[j.strip() for j in i] for i in metadata]
 metadata = [[j.replace('\'', '') for j in i] for i in metadata]
-metadata = [[j.replace('\'', '') for j in i] for i in metadata]
 metadata = [[j if j[-1] != ',' else j[:-1] for j in i] for i in metadata]
 metadata = dict(metadata)
 
@@ -77,8 +74,6 @@ if __name__ == '__main__':
 
     filename = f'{fn}{bl_version}{version}{support}{ext}'
     path_to_zip = os.path.join(dist, filename)
-
-    path_to_files = []
 
     with ZipFile(path_to_zip, 'w') as ZipObj:
         zipdir('.', ZipObj)
