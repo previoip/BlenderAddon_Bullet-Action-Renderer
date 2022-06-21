@@ -4,10 +4,17 @@ from bpy.types import PropertyGroup
 
 class BulletActionScenePropertyGroup(PropertyGroup):
     addn_export_folder: StringProperty(
-        name='subfolder export', 
-        description = 'Addon export subfolder',
+        name='Export folder name', 
+        description = 'Export folder name',
         default='export'
         )
+
+    addn_export_folder_from_action: BoolProperty(
+        name='Export folder name from action name',
+        description = 'Set export folder name as animation action attr',
+        default=False
+        )
+
     addn_render_type: BoolProperty(
         name='Render as Bulletaction',
         description = 'Render BulletAction thing instead of incrimental 360 view (Increment will be disabled)',

@@ -1,18 +1,18 @@
-# run as script
-load_from_script_tab = __name__ == '__main__'
-
-import bpy
-
 bl_info = {
     'name': 'BulletAction Render Toolkit',
     'description': 'render 360 degree bullet-action views with some degree of customizability.',
     'category': 'Render',
-    'location': 'Properties > Render > Render Orthos Addon',
-    'support': 'TESTING',
+    'location': 'View3D > Properties > Render',
+    'support': 'COMMUNITY',
     'blender': (2, 80, 0),
-    'version': (0, 2, 0),
+    'version': (0, 2, 1),
     'author': 'Previo Prakasa'
 }
+
+import bpy
+
+# run as script
+load_from_script_tab = __name__ == '__main__'
 
 if load_from_script_tab:
     import os, sys

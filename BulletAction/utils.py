@@ -138,10 +138,11 @@ def get_extrema_from_vector(vec: Vector):
     return mag, ax
 
 def is_empty_vector(vec: Vector):
-    return vec.x == 0  and vec.y == 0  and vec.z == 0
+    epsilon = 1e-3
+    return vec.x <= epsilon  and vec.y <= epsilon  and vec.z <= epsilon
 
 def radius_from_origin(vec: Vector, ref_point: Vector = Vector((0,0,0))):
-    if is_empty_vector(vec) and is_empty_vector(ref_point) and is_empty_vector(vec - ref_point):
+    if is_empty_vector(vec - ref_point):
         return 0
     vec = vec - ref_point
     return sqrt(vec.x**2 + vec.y**2 + vec.z**2)

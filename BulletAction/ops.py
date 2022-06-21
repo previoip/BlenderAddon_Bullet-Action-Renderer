@@ -195,26 +195,28 @@ class BeginRenderOnTarget:
         fp = scene.render.filepath
         previously_selected = context.selected_objects
         bpy.ops.object.select_all(action='DESELECT')
-        target_action = ""
-        if utils.collection_has_prefix(objects.keys(), addon_prop.priv_t_obj_name):
+        filepath_subfolder = ""
+        if not addon_prop.addn_export_folder_from_action and addon_prop.addn_export_folder:
+            filepath_subfolder = addon_prop.addn_export_folder
+        elif addon_prop.addn_export_folder_from_action and utils.collection_has_prefix(objects.keys(), addon_prop.priv_t_obj_name):
             target_object = objects[addon_prop.priv_t_obj_name]
             target_object.select_set(True)
-            target_action = target_object.animation_data.action.name if target_object.animation_data is not None and target_object.animation_data.action is not None else target_object.name
+            filepath_subfolder = target_object.animation_data.action.name if target_object.animation_data is not None and target_object.animation_data.action is not None else target_object.name
             bpy.ops.object.select_all(action='DESELECT')
-        if target_action:
-            fp = os.path.join(fp, target_action)
+        if filepath_subfolder:
+            fp = os.path.join(fp, filepath_subfolder)
             utils.mkdir(fp)
         for i in range(incr_n):
             if not addon_prop.addn_render_isanimated:
                 for frame in range(startframe, stopframe, frame_skip):
                     context.scene.frame_set(frame)
-                    filename = f'{target_action}_f{frame:04}_d{int(degrees(i*incr_rot)):03}'
+                    filename = f'{filepath_subfolder}_f{frame:04}_d{int(degrees(i*incr_rot)):03}'
                     exportpath = os.path.join(fp, f'view_{int(degrees(i*incr_rot)):03}')
                     utils.mkdir(exportpath)
                     utils.render_to_filepath(context=context, target_filepath=exportpath, target_filename=filename)
             else:
                 frame = context.scene.frame_current
-                filename = f'{target_action}_f{frame:04}_d{int(degrees(i*incr_rot)):03}'
+                filename = f'{filepath_subfolder}_f{frame:04}_d{int(degrees(i*incr_rot)):03}'
                 exportpath = os.path.join(fp, f'view_{int(degrees(i*incr_rot)):03}')
                 utils.mkdir(exportpath)
                 utils.render_to_filepath(context=context, target_filepath=exportpath, target_filename=filename)
@@ -239,10 +241,38 @@ class TestRenderOnTarget:
         addon_prop = scene.bulletActionAddon_settings
         incr_n = addon_prop.cam_incr
         incr_rot = 2 * pi / incr_n
-        for i in range(incr_n):
-            pass
-            # rotates, set file output name,renders
-        # reset position
+
+        camera = objects[self.CAMERA_NAME]
+        pivot = objects[self.EMPTY_TARGET_NAME]
+
+        fp = scene.render.filepath
+        previously_selected = context.selected_objects
+        bpy.ops.object.select_all(action='DESELECT')
+        filepath_subfolder = ""
+        if not addon_prop.addn_export_folder_from_action and addon_prop.addn_export_folder:
+            filepath_subfolder = addon_prop.addn_export_folder
+        elif addon_prop.addn_export_folder_from_action and utils.collection_has_prefix(objects.keys(), addon_prop.priv_t_obj_name):
+            target_object = objects[addon_prop.priv_t_obj_name]
+            target_object.select_set(True)
+            filepath_subfolder = target_object.animation_data.action.name if target_object.animation_data is not None and target_object.animation_data.action is not None else target_object.name
+            bpy.ops.object.select_all(action='DESELECT')
+        if filepath_subfolder:
+            fp = os.path.join(fp, filepath_subfolder)
+            utils.mkdir(fp)
+
+        for i in range(incr_n): 
+            frame = context.scene.frame_current
+            filename = f'{filepath_subfolder}_f{frame:04}_d{int(degrees(i*incr_rot)):03}'
+            exportpath = os.path.join(fp, f'view_{int(degrees(i*incr_rot)):03}')
+            utils.mkdir(exportpath)
+            utils.render_to_filepath(context=context, target_filepath=exportpath, target_filename=filename)
+            utils.pivot_object_from_target_local_axis(camera, pivot, incr_rot)
+
+        if previously_selected:
+            for o in previously_selected:
+                o.select_set(state=True)
+        context.view_layer.objects.active = previously_selected[0]
+
         return {'FINISHED'}
 
 ### -----------------------

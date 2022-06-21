@@ -4,14 +4,12 @@ import re, os
 
 
 folder_excludes = [
+    '. ',
     '.git',
-    '.gitignore',
-    '.gitattributes',
     '__pycache__',
     'Blendfiles',
     'rel',
     'Export',
-    'bundle_zip.py'
 ]
 
 file_excludes = [
